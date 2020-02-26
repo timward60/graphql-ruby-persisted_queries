@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 require "graphql/persisted_queries/hash_generator_builder"
-require "graphql/persisted_queries/resolver"
+require "graphql/persisted_queries/string_resolver"
 require "graphql/persisted_queries/multiplex_resolver"
 
 module GraphQL

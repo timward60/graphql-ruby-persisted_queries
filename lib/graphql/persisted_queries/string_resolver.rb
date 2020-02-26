@@ -3,21 +3,7 @@
 module GraphQL
   module PersistedQueries
     # Fetches or stores query string in the storage
-    class Resolver
-      # Raised when persisted query is not found in the storage
-      class NotFound < StandardError
-        def message
-          "PersistedQueryNotFound"
-        end
-      end
-
-      # Raised when provided hash is not matched with query
-      class WrongHash < StandardError
-        def message
-          "Wrong hash was passed"
-        end
-      end
-
+    class StringResolver
       def initialize(extensions, schema)
         @extensions = extensions
         @schema = schema

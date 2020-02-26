@@ -4,7 +4,7 @@ require "spec_helper"
 
 require "digest"
 
-RSpec.describe GraphQL::PersistedQueries::Resolver do
+RSpec.describe GraphQL::PersistedQueries::StringResolver do
   describe "#resolve" do
     let(:extensions) { {} }
     let(:store) do
@@ -53,7 +53,7 @@ RSpec.describe GraphQL::PersistedQueries::Resolver do
 
           it "raises exception" do
             expect { subject }.to raise_error(
-              GraphQL::PersistedQueries::Resolver::WrongHash
+              GraphQL::PersistedQueries::WrongHash
             )
           end
         end
@@ -91,7 +91,7 @@ RSpec.describe GraphQL::PersistedQueries::Resolver do
             # rubocop: disable Lint/HandleExceptions
             begin
               subject
-            rescue GraphQL::PersistedQueries::Resolver::NotFound
+            rescue GraphQL::PersistedQueries::NotFound
               # Ignore the expected error
             end
             # rubocop: enable Lint/HandleExceptions

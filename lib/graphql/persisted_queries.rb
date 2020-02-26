@@ -10,6 +10,20 @@ require "graphql/persisted_queries/http_method_analyzer"
 module GraphQL
   # Plugin definition
   module PersistedQueries
+    # Raised when persisted query is not found in the storage
+    class NotFound < StandardError
+      def message
+        "PersistedQueryNotFound"
+      end
+    end
+
+    # Raised when provided hash is not matched with query
+    class WrongHash < StandardError
+      def message
+        "Wrong hash was passed"
+      end
+    end
+
     def self.use(schema_defn, options = {})
       schema = schema_defn.is_a?(Class) ? schema_defn : schema_defn.target
       SchemaPatch.patch(schema)
