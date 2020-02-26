@@ -32,7 +32,7 @@ module GraphQL
         extensions = query_params.delete(:extensions)
         return unless extensions
 
-        query_params[:query] = StringResolver.new(extensions, @schema).resolve(query_params[:query])
+        query_params.merge!(StringResolver.new(query_params, extensions, @schema).resolve)
       rescue NotFound, WrongHash => e
         results[pos] = { "errors" => [{ "message" => e.message }] }
       end

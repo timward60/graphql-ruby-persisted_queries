@@ -15,6 +15,7 @@ RSpec.describe GraphQL::PersistedQueries::StringResolver do
     end
     let(:query) { "query { user }" }
     let(:query_str) { query }
+    let(:query_params) { { query: query_str } }
     let(:hash_generator_proc) { proc { |value| Digest::SHA256.hexdigest(value) } }
     let(:hash) { hash_generator_proc.call(query) }
     let(:error_handler) { GraphQL::PersistedQueries::ErrorHandlers::DefaultErrorHandler.new({}) }
@@ -28,11 +29,11 @@ RSpec.describe GraphQL::PersistedQueries::StringResolver do
     end
 
     subject do
-      described_class.new(extensions, schema).resolve(query_str)
+      described_class.new(query_params, extensions, schema).resolve
     end
 
     context "when extensions hash is empty" do
-      it { is_expected.to eq(query) }
+      it { is_expected.to eq(query: query) }
     end
 
     context "when extensions hash is passed" do
@@ -41,11 +42,11 @@ RSpec.describe GraphQL::PersistedQueries::StringResolver do
       end
 
       context "when query_str is provided" do
-        it { is_expected.to eq(query) }
+        it { is_expected.to eq(query: query) }
 
         it "saves query to store" do
           subject
-          expect(store).to have_received(:save_query).with(hash, query_str)
+          expect(store).to have_received(:save_query).with(hash, query)
         end
 
         context "when hash is incorrect" do
@@ -62,7 +63,7 @@ RSpec.describe GraphQL::PersistedQueries::StringResolver do
       context "when query_str is not provided" do
         let(:query_str) { nil }
 
-        it { is_expected.to eq(query) }
+        it { is_expected.to eq(query: query) }
 
         it "fetches query from store" do
           subject

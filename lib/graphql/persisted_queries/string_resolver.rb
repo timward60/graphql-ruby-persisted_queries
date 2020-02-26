@@ -4,22 +4,25 @@ module GraphQL
   module PersistedQueries
     # Fetches or stores query string in the storage
     class StringResolver
-      def initialize(extensions, schema)
+      def initialize(query_params, extensions, schema)
+        @query_params = query_params
         @extensions = extensions
         @schema = schema
       end
 
-      def resolve(query_str)
-        return query_str if hash.nil?
+      def resolve
+        return @query_params if hash.nil?
+
+        resolved = {}
 
         if query_str
           persist_query(query_str)
         else
-          query_str = with_error_handling { @schema.persisted_query_store.fetch_query(hash) }
-          raise NotFound if query_str.nil?
+          resolved[:query] = with_error_handling { @schema.persisted_query_store.fetch_query(hash) }
+          raise NotFound unless resolved[:query]
         end
 
-        query_str
+        @query_params.merge(resolved)
       end
 
       private
@@ -38,6 +41,10 @@ module GraphQL
 
       def hash
         @hash ||= @extensions.dig("persistedQuery", "sha256Hash")
+      end
+
+      def query_str
+        @query_params[:query]
       end
     end
   end
