@@ -36,12 +36,21 @@ module GraphQL
           @memory_adapter.save_query(hash, query)
         end
 
+        def delete_query(hash)
+          @redis_adapter.delete_query(hash)
+          @memory_adapter.delete_query(hash)
+        end
+
         # We don't need to implement our own traces for this adapter since the
         # underlying adapters will emit the proper events for us.  However,
         # since tracers can be defined at any time, we need to pass them through.
         def tracers=(tracers)
           @memory_adapter.tracers = tracers
           @redis_adapter.tracers = tracers
+        end
+
+        def requires_marshaling?
+          true
         end
 
         private

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "graphql/persisted_queries/error_handlers"
+require "graphql/persisted_queries/resolvers"
 require "graphql/persisted_queries/schema_patch"
 require "graphql/persisted_queries/store_adapters"
 require "graphql/persisted_queries/version"
@@ -10,6 +11,21 @@ require "graphql/persisted_queries/http_method_analyzer"
 module GraphQL
   # Plugin definition
   module PersistedQueries
+    # Raised when persisted query is not found in the storage
+    class NotFound < StandardError
+      def message
+        "PersistedQueryNotFound"
+      end
+    end
+
+    # Raised when provided hash is not matched with query
+    class WrongHash < StandardError
+      def message
+        "Wrong hash was passed"
+      end
+    end
+
+    # rubocop: disable Metrics/MethodLength
     def self.use(schema_defn, options = {})
       schema = schema_defn.is_a?(Class) ? schema_defn : schema_defn.target
       SchemaPatch.patch(schema)
@@ -23,8 +39,12 @@ module GraphQL
 
       schema.persisted_queries_tracing_enabled = options.delete(:tracing)
 
+      resolver = options.delete(:resolver) || :string
+      schema.configure_persisted_query_resolver(resolver)
+
       store = options.delete(:store) || :memory
       schema.configure_persisted_query_store(store, options)
     end
+    # rubocop: enable Metrics/MethodLength
   end
 end

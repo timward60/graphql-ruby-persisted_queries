@@ -3,6 +3,7 @@
 require "graphql"
 require "graphql/persisted_queries"
 require "graphql/support/test_schema"
+require "graphql/support/shared_examples_for_resolver_error_handling"
 
 ENV["RAILS_ENV"] = "test"
 

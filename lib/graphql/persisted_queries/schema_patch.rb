@@ -1,7 +1,8 @@
 # frozen_string_literal: true
 
 require "graphql/persisted_queries/hash_generator_builder"
-require "graphql/persisted_queries/resolver"
+require "graphql/persisted_queries/string_resolver"
+require "graphql/persisted_queries/document_resolver"
 require "graphql/persisted_queries/multiplex_resolver"
 
 module GraphQL
@@ -15,7 +16,8 @@ module GraphQL
         end
       end
 
-      attr_reader :persisted_query_store, :hash_generator_proc, :persisted_query_error_handler
+      attr_reader :persisted_query_store, :hash_generator_proc, :persisted_query_error_handler,
+                  :persisted_query_resolver_class
       attr_writer :persisted_queries_tracing_enabled
 
       def configure_persisted_query_store(store, options)
@@ -26,6 +28,10 @@ module GraphQL
 
       def configure_persisted_query_error_handler(handler)
         @persisted_query_error_handler = ErrorHandlers.build(handler)
+      end
+
+      def configure_persisted_query_resolver(resolver)
+        @persisted_query_resolver_class = Resolvers.build(resolver)
       end
 
       def hash_generator=(hash_generator)

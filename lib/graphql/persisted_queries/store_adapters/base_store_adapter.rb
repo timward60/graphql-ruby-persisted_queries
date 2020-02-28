@@ -18,6 +18,14 @@ module GraphQL
           raise NotImplementedError
         end
 
+        def delete_query(_hash)
+          raise NotImplementedError
+        end
+
+        def requires_marshaling?
+          raise NotImplementedError
+        end
+
         protected
 
         def trace(key, metadata)
