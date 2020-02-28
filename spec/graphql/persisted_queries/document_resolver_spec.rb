@@ -11,6 +11,8 @@ RSpec.describe GraphQL::PersistedQueries::DocumentResolver do
       double("TestStore").tap do |store|
         allow(store).to receive(:save_query)
         allow(store).to receive(:fetch_query).and_return(marshaled_query)
+        allow(store).to receive(:requires_marshaling?).and_return(true)
+        allow(store).to receive(:delete_query).and_return("unmarshalable")
       end
     end
     let(:query) { "query { user }" }
@@ -61,6 +63,18 @@ RSpec.describe GraphQL::PersistedQueries::DocumentResolver do
             )
           end
         end
+
+        context "when the store doesn't require marshaling" do
+          before { allow(store).to receive(:requires_marshaling?).and_return(false) }
+
+          it "saves the object without marshaling" do
+            subject
+            expect(store).to have_received(:save_query).with(
+              key,
+              be_a(GraphQL::Language::Nodes::Document)
+            )
+          end
+        end
       end
 
       context "when query_str is not provided" do
@@ -71,6 +85,37 @@ RSpec.describe GraphQL::PersistedQueries::DocumentResolver do
         it "fetches query from store" do
           subject
           expect(store).to have_received(:fetch_query).with(key)
+        end
+
+        context "when the fetched object isn't unmarshalable" do
+          before do
+            allow(store).to receive(:fetch_query).and_return("unmarshalable")
+          end
+
+          it "acts as a cache miss" do
+            expect { subject }.to raise_error(
+              GraphQL::PersistedQueries::NotFound
+            )
+          end
+
+          it "deletes the invalid object" do
+            begin
+              subject
+            rescue GraphQL::PersistedQueries::NotFound # rubocop: disable Lint/HandleExceptions
+              # Ignore the expected error
+            end
+
+            expect(store).to have_received(:delete_query).with(key)
+          end
+        end
+
+        context "when the store doesn't require marshaling" do
+          before { allow(store).to receive(:requires_marshaling?).and_return(false) }
+
+          it "handles objects returned from the store" do
+            allow(store).to receive(:fetch_query).and_return(parsed_query)
+            subject
+          end
         end
       end
 

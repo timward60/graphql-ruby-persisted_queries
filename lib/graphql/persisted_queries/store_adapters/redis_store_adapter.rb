@@ -24,6 +24,14 @@ module GraphQL
           @redis_proc.call { |redis| redis.set(key_for(hash), query, ex: @expiration) }
         end
 
+        def delete_query(hash)
+          @redis_proc.call { |redis| redis.del(key_for(hash)) }
+        end
+
+        def requires_marshaling?
+          true
+        end
+
         private
 
         def key_for(hash)

@@ -21,7 +21,7 @@ module GraphQL
         if query_str
           result[:document] = persist_query(query_str)
         else
-          result[:document] = fetch_marshaled_object
+          result[:document] = should_marshal? ? fetch_marshaled_object : fetch_object
           raise NotFound unless result[:document]
         end
 
@@ -36,8 +36,12 @@ module GraphQL
         @schema.persisted_query_error_handler.call(e)
       end
 
+      def fetch_object
+        with_error_handling { @schema.persisted_query_store.fetch_query(key) }
+      end
+
       def fetch_marshaled_object
-        cached = with_error_handling { @schema.persisted_query_store.fetch_query(key) }
+        cached = fetch_object
         begin
           Marshal.load(cached) if cached # rubocop:disable Security/MarshalLoad
         rescue TypeError
@@ -53,7 +57,8 @@ module GraphQL
 
         GraphQL.parse(query_str).tap do |document|
           with_error_handling do
-            @schema.persisted_query_store.save_query(key, Marshal.dump(document))
+            cachable_object = should_marshal? ? Marshal.dump(document) : document
+            @schema.persisted_query_store.save_query(key, cachable_object)
           end
         end
       rescue GraphQL::ParseError
@@ -70,6 +75,10 @@ module GraphQL
 
       def query_str
         @query_params[:query]
+      end
+
+      def should_marshal?
+        @schema.persisted_query_store.requires_marshaling?
       end
     end
   end

@@ -16,6 +16,14 @@ module GraphQL
         def save_query(hash, query)
           @storage[hash] = query
         end
+
+        def delete_query(hash)
+          @storage.delete(hash)
+        end
+
+        def requires_marshaling?
+          false
+        end
       end
     end
   end

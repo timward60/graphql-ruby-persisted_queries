@@ -14,6 +14,7 @@ RSpec.shared_examples "when the store fails during resolution" do
       store = double("TestStore")
       allow(store).to receive(:save_query)
       allow(store).to receive(:fetch_query).and_raise(error)
+      allow(store).to receive(:requires_marshaling?).and_return(true)
       store
     end
 
@@ -35,6 +36,7 @@ RSpec.shared_examples "when the store fails during resolution" do
       store = double("TestStore")
       allow(store).to receive(:save_query).and_raise(error)
       allow(store).to receive(:fetch_query)
+      allow(store).to receive(:requires_marshaling?).and_return(true)
       store
     end
 

@@ -14,6 +14,14 @@ module GraphQL
         def save_query(_hash, _query)
           raise NotImplementedError
         end
+
+        def delete_query(_hash)
+          raise NotImplementedError
+        end
+
+        def requires_marshaling?
+          raise NotImplementedError
+        end
       end
     end
   end

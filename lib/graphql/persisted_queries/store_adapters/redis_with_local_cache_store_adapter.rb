@@ -36,6 +36,15 @@ module GraphQL
           @memory_adapter.save_query(hash, query)
         end
 
+        def delete_query(hash)
+          @redis_adapter.delete_query(hash)
+          @memory_adapter.delete_query(hash)
+        end
+
+        def requires_marshaling?
+          true
+        end
+
         private
 
         attr_reader :redis_adapter, :memory_adapter
