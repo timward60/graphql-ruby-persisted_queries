@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require "graphql/persisted_queries/error_handlers"
+require "graphql/persisted_queries/resolvers"
 require "graphql/persisted_queries/schema_patch"
 require "graphql/persisted_queries/store_adapters"
 require "graphql/persisted_queries/version"
@@ -34,6 +35,9 @@ module GraphQL
 
       error_handler = options.delete(:error_handler) || :default
       schema.configure_persisted_query_error_handler(error_handler)
+
+      resolver = options.delete(:resolver) || :string
+      schema.configure_persisted_query_resolver(resolver)
 
       store = options.delete(:store) || :memory
       schema.configure_persisted_query_store(store, options)

@@ -32,7 +32,7 @@ module GraphQL
         extensions = query_params.delete(:extensions)
         return unless extensions
 
-        query_params.merge!(StringResolver.new(query_params, extensions, @schema).resolve)
+        query_params.merge!(resolver.new(query_params, extensions, @schema).resolve)
       rescue NotFound, WrongHash => e
         results[pos] = { "errors" => [{ "message" => e.message }] }
       end
@@ -43,6 +43,10 @@ module GraphQL
           resolve_idx.map { |i| @queries.at(i) }, @kwargs
         )
         resolve_idx.each_with_index { |res_i, mult_i| results[res_i] = multiplex_result[mult_i] }
+      end
+
+      def resolver
+        @schema.persisted_query_resolver_class
       end
     end
   end
