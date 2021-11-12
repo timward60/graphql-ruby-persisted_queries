@@ -64,6 +64,14 @@ RSpec.describe GraphQL::PersistedQueries::DocumentResolver do
           end
         end
 
+        context "when query string is invalid" do
+          let(:query) { "query user }" }
+
+          it "raises exception" do
+            expect { subject }.to raise_error(GraphQL::ParseError)
+          end
+        end
+
         context "when the store doesn't require marshaling" do
           before { allow(store).to receive(:requires_marshaling?).and_return(false) }
 

@@ -66,5 +66,18 @@ RSpec.describe GraphQL::PersistedQueries::MultiplexResolver do
         )
       end
     end
+
+    context "when query is invalid" do
+      let(:query1) { "query someData }" }
+
+      it "returns errors" do
+        expect(subject).to eq(
+          [
+            {"errors"=>[{"message"=>"Parse error on \"}\" (RCURLY) at [1, 16]", "locations"=>[{"line"=>1, "column"=>16}]}]},
+            { "data" => { "someOtherData" => "some other value" } }
+          ]
+        )
+      end
+    end
   end
 end

@@ -61,8 +61,6 @@ module GraphQL
             @schema.persisted_query_store.save_query(key, cachable_object)
           end
         end
-      rescue GraphQL::ParseError
-        nil
       end
 
       def hash

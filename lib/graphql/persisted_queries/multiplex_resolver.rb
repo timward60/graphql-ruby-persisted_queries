@@ -35,6 +35,8 @@ module GraphQL
         query_params.merge!(resolver.new(query_params, extensions, @schema).resolve)
       rescue NotFound, WrongHash => e
         results[pos] = { "errors" => [{ "message" => e.message }] }
+      rescue GraphQL::ParseError => e
+        results[pos] = { "errors" => [ e.to_h ]}
       end
 
       def perform_multiplex
